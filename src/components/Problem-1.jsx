@@ -1,30 +1,57 @@
 import React, { useState } from 'react';
 
 const Problem1 = () => {
+  const [show, setShow] = useState('all');
   const [formData, setFormData] = useState({
     name: '',
     status: '',
   });
+  const [data, setData] = useState([]);
 
-  const [show, setShow] = useState('all');
-
-  const handleClick = (val) => {
-    setShow(val);
-  };
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((data) => ({
+      ...data,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Perform form validation or submit the data to an API
-    console.log(formData);
-    // Reset the form fields
-    setFormData({
-      name: '',
-      status: '',
-    });
+    setData((data) => [...data, formData]);
+    setFormData({ name: '', status: '' });
   };
+
+  const handleClick = (filter) => {
+    setShow(filter);
+  };
+
+  const filteredData = data.filter((singleData) => {
+    let newStatus = singleData.status.toLowerCase();
+    if (show === 'active') {
+      return newStatus === 'active';
+    } else if (show === 'completed') {
+      return newStatus === 'completed';
+    } else {
+      return true;
+    }
+  });
+  filteredData.sort((a, b) => {
+    const statusA = a.status.toLowerCase();
+    const statusB = b.status.toLowerCase();
+    if (statusA === 'active' && statusB !== 'active') {
+      return -1;
+    } else if (
+      statusA === 'completed' &&
+      statusB !== 'active' &&
+      statusB !== 'completed'
+    ) {
+      return -1;
+    } else {
+      return 1;
+    }
+  });
+
   return (
     <div className="container">
       <div className="row justify-content-center mt-5">
@@ -99,7 +126,14 @@ const Problem1 = () => {
                 <th scope="col">Status</th>
               </tr>
             </thead>
-            <tbody></tbody>
+            <tbody>
+              {filteredData.map((data) => (
+                <tr>
+                  <td>{data.name}</td>
+                  <td>{data.status}</td>
+                </tr>
+              ))}
+            </tbody>
           </table>
         </div>
       </div>
